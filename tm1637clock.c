@@ -13,7 +13,7 @@
 
 /*
  * Displays digital time on TM1637
- * Writen by Mishin Alexander, 2018
+ * Writen by Mishin Alexander, 2020
  */
 
 #define CLOCKPOINT_ALWAYS	0

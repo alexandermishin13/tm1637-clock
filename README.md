@@ -1,31 +1,42 @@
-# digitalclock
+# tm1637-clock
 
 ![Raspberry PI 2 & TM1637](/raspberry-pi_tm1637.jpg?raw=true "Raspberry PI 2 & TM1637")
 
 ## About
 
-A simple clock daemon on `tm1637-display` over `gpio` written for **FreeBSD**.
+A simple clock daemon which worked with
+[tm1637-kmod](https://gitlab.com/alexandermishin13/tm1637-kmod) kernel driver
+written for **FreeBSD**. It is a successor of my other project
+[digitalclock](https://gitlab.com/alexandermishin13/digitalclock) based on a 
+library [tm1637-display](https://gitlab.com/alexandermishin13/tm1637-display).
+I cut out a socket functional from it with controlling a brightness level of
+the display. This functionality is implemented by the kernel driver using
+sysctl variables.
 
-* It creates a `pidfile` and uses `daemon`(8) for detach from a terminal;
-* It uses `timer_create`(2) for output a time and marking seconds and signal interception for stopping itself correctly;
-* It also uses a `socket` for a connection with another running process of itself for controls purpose.
+The daemon:
+* creates a `pidfile` and uses `daemon`(8) if run with `-b` parameter for
+detach from a terminal;
+* uses `timer_create`(2) for output time and marking seconds by colon
+(1, 2 times per second or always on);
+* a signal interception for stopping itself correctly;
 
-I wrote this program for my little-task server on **Raspberry Pi 2** (One of a task is a NTPD service for getting a time from GLONASS).
-For this program, I had to adapt the [tm1637-display library for Arduino](https://github.com/AlexGyver/GyverLibs/tree/master/TM1637_Gyver)
-(written by Fred.Chu and modified by AlexGyver) for FreeBSD.
+I wrote this program for my little-task server on **Raspberry Pi 2** (One of
+a task is a NTPD service for getting a time from GLONASS).
 
 ## Dependencies
 
-For the `digitalclock` program You need:
-* ARM SoC, e.g. **Raspberry Pi 2** or **3** (I think a **Orange** or **Banana** also is good);
-* **FreeBSD 11** or **12** (as I have) as operating system;
-* C++ compatible compilator (You already have clang++, I'm sure);
-* An installed [tm1637-display library for FreeBSD](https://gitlab.com/alexandermishin13/tm1637-display).
+For the `tm1637-clock` program You need:
+* ARM SoC, e.g. **Raspberry Pi 2** or **3** (**Orange** or **Banana** also is
+good);
+* **FreeBSD 12** operating system;
+* C compatible compilator (FreeBSD already has a native `clang`);
+* An installed and loaded the [tm1637-kmod](https://gitlab.com/alexandermishin13/tm1637-kmod)
+kernel driver.
 
 ## Download
 
 ```
-git clone https://gitlab.com/alexandermishin13/digitalclock.git
+git clone https://gitlab.com/alexandermishin13/tm1637-clock.git
 ```
 
 ## Installation
@@ -35,8 +46,10 @@ For installation type:
 make
 sudo make install
 ```
-The executable file will be installed as **/usr/local/sbin/digitalclock** and
-the service file as **/usr/local/etc/rc.d/digitalclock**.
+The executable file will be installed as **/usr/local/sbin/tm1637clock** and
+the service file as **/usr/local/etc/rc.d/tm1637clock**. You also can a copy
+a **/rc.conf.d/tm1637clock.example** to **/usr/local/etc/rc.conf.d/tm1637clock**
+to control the service.
 
 For deinstallation type:
 ```
@@ -45,47 +58,40 @@ sudo make uninstall
 
 ## Usage
 
-The programm can be run either as a daemon and as a control utility for the daemon.
-A bright level can be set by an `-l` key followed by an integer from `0` to `7` (from darkest to brightest).
-A clock point change mode can be set by an `-p` key followed by integer.
-Possible values are `0`-always on, `1`-blinks once a second and `2`-blinks twice per second.
-Least efficient processor mode is `2`, although it was optimized.
-Almost two times more efficient mode is `1` as it less often writes to a display.
-And even more efficient mode is `0` as it writes to the display just once a minute.
-
-On that moment implemented only brightness control by the control utility mode.
+The program can be run either as a daemon (with `-b` parameter) and as a 
+standalone program.
+A clock point change mode can be set by a `-p` key followed by integer. Possible
+values are `0`-always on, `1`-blinks once a second and `2`-blinks twice per
+second. Least processor efficient mode is `2`, although it was optimized. Almost
+two times more efficient mode is `1` as it less often writes to the display.
+And even more efficient mode is `0` as it writes to the display just once a
+minute.
 
 Running as a daemon
 ```
-./digitalclock -b [-l <brightness>] [-p <clockpoint mode>]
+./tm1637clock -b [-p <clockpoint mode>]
 ```
 
 Running as a control utility
 ```
-./digitalclock [-l <brightness>]
+./tm1637clock [-p <clockpoint mode>]
 ```
 
 ## Manage the service
 
-You can manage the service by one of a command:
-```
-service digitalclock onestart
-service digitalclock onestop
-service digitalclock onestatus
-```
-
 If You wish to start service automatically with a boot of operating system,
 You can:
 * add to a file */etc/rc.conf*
-* create a new file */usr/local/etc/rc.conf.d/digitalclock* and add a followed string to it:
+* create a new file */usr/local/etc/rc.conf.d/tm1637clock* and add a followed
+string to it:
 ```
-digitalclock_enable=YES
-```
-
-Then You can manage the service by:
-```
-service digitalclock start
-service digitalclock stop
-service digitalclock status
+tm1637clock_enable="YES"
+tm1637clock_flags="-b -p 2"
 ```
 
+Then You can manage the service by one of a command:
+```
+service tm1637clock start
+service tm1637clock stop
+service tm1637clock status
+```
