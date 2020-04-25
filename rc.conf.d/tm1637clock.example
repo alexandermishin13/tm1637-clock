@@ -1,2 +1,2 @@
 tm1637clock_enable="YES"
-tm1637clock_flags="-b -p 1 -l 5"
+tm1637clock_flags="-b -p 1"
