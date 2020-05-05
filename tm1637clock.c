@@ -1,3 +1,9 @@
+/*-
+ * Copyright (c) 2020 Alexander A. Mishin <mishin@mh.net.ru>
+ * All rights reserved.
+ *
+ */
+
 #include <libutil.h>
 #include <err.h>
 #include <errno.h>
@@ -10,23 +16,7 @@
 #include <fcntl.h>
 #include <stdbool.h>
 #include <sys/ioctl.h>
-
-/*
- * Displays digital time on TM1637
- * Writen by Mishin Alexander, 2020
- */
-
-#define CLOCKPOINT_ALWAYS	0
-#define CLOCKPOINT_ONCE		1
-#define CLOCKPOINT_TWICE	2
-
-#define TM1637_IOCTL_CLEAR	_IO('T', 1)
-#define TM1637_IOCTL_OFF	_IO('T', 2)
-#define TM1637_IOCTL_ON		_IO('T', 3)
-#define TM1637_IOCTL_BRIGHTNESS	_IOW('T', 11, uint8_t)
-#define TM1637_IOCTL_CLOCKPOINT	_IOW('T', 12, bool)
-
-#define sizeof_field(type,field)  (sizeof(((type *)0)->field))
+#include "tm1637clock.h"
 
 timer_t timerID;
 struct pidfh *pfh;
@@ -34,11 +24,11 @@ int dev;
 
 bool clockPoint = true;
 unsigned char digits[10] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f };
-unsigned char TimeDisp[4] = {'-'}; // Fill with not numbers for not succesful first compare
+unsigned char TimeDisp[4] = {0};
 
 /* Parameters */
 bool backgroundRun = false;
-uint8_t tpsPoint = 0; // Times per second switch a point sign
+uint8_t tpsPoint = CLOCKPOINT_ALWAYS; // Times per second switch a point sign
 
 /* Signals handler. Prepare the programm for end */
 static void
@@ -66,28 +56,30 @@ void
 timer_handler(int sig, siginfo_t *si, void *uc)
 {
   time_t rawtime;
-  struct tm tm, *timeinfo;
-  unsigned char loMin;
+  struct tm tm;
 
-  /* Get local time (with timezone) */
-  time (&rawtime);
-  timeinfo = localtime_r(&rawtime, &tm);
-
-  /* Prepare new display digits array if a time change occurs
-   * or use old one
-   */
-  loMin = digits[timeinfo->tm_min % 10]; // Check if change occurs
-  if (loMin != TimeDisp[3])
+  /* No need to check time often than once of a second */
+  if (tpsPoint < CLOCKPOINT_TWICE || clockPoint)
   {
+    /* Get local time (with timezone) */
+    time (&rawtime);
+    localtime_r(&rawtime, &tm);
 
-    TimeDisp[0] = digits[timeinfo->tm_hour / 10];
-    TimeDisp[1] = digits[timeinfo->tm_hour % 10];
-    TimeDisp[2] = digits[timeinfo->tm_min / 10];
-    TimeDisp[3] = loMin; // Calculated already
+    /* Prepare new display digits array if a time change occurs
+     * or use old one
+     */
+    unsigned char loMin = digits[tm.tm_min % 10]; // Check if change occurs
+    if (loMin != TimeDisp[3])
+    {
+      TimeDisp[0] = digits[tm.tm_hour / 10];
+      TimeDisp[1] = digits[tm.tm_hour % 10];
+      TimeDisp[2] = digits[tm.tm_min / 10];
+      TimeDisp[3] = loMin; // Calculated already
 
-    /* Display a just prepared time array */
-    lseek(dev, 0, SEEK_SET);
-    write(dev, TimeDisp, 4);
+      /* Display a just prepared time array */
+      lseek(dev, 0, SEEK_SET);
+      write(dev, TimeDisp, 4);
+    }
   }
 
   /* Toggle a clock point for each timer tick if not always on */
@@ -128,11 +120,12 @@ createTimer(uint8_t tps)
   struct itimerspec its;
   its.it_value.tv_sec     = ts.tv_sec + 1; // Align a start to next second...
   its.it_value.tv_nsec    = 0;             // ...as exactly as we could
+
   /* Normally the timer handler runs once a second.
    * But if we want a clock point changes two times per second then so be it.
    * And if there is no clock point changes at all, all the same once per second
    */
-  if (tps == 2) {
+  if (tps == CLOCKPOINT_TWICE) {
       its.it_interval.tv_sec  = 0;
       its.it_interval.tv_nsec = 500000000L;    // A half of a second
   }
