@@ -66,23 +66,22 @@ void
 timer_handler(int sig, siginfo_t *si, void *uc)
 {
   time_t rawtime;
-  struct tm tm, *timeinfo;
+  struct tm tm;
   unsigned char loMin;
 
   /* Get local time (with timezone) */
   time (&rawtime);
-  timeinfo = localtime_r(&rawtime, &tm);
+  localtime_r(&rawtime, &tm);
 
   /* Prepare new display digits array if a time change occurs
    * or use old one
    */
-  loMin = digits[timeinfo->tm_min % 10]; // Check if change occurs
+  loMin = digits[tm.tm_min % 10]; // Check if change occurs
   if (loMin != TimeDisp[3])
   {
-
-    TimeDisp[0] = digits[timeinfo->tm_hour / 10];
-    TimeDisp[1] = digits[timeinfo->tm_hour % 10];
-    TimeDisp[2] = digits[timeinfo->tm_min / 10];
+    TimeDisp[0] = digits[tm.tm_hour / 10];
+    TimeDisp[1] = digits[tm.tm_hour % 10];
+    TimeDisp[2] = digits[tm.tm_min / 10];
     TimeDisp[3] = loMin; // Calculated already
 
     /* Display a just prepared time array */
