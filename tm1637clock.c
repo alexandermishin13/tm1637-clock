@@ -38,7 +38,7 @@ termination_handler(int signum)
   timer_delete(timerID);
 
   /* Off the display and terminate connection */
-  ioctl(dev, TM1637_IOCTL_OFF);
+  ioctl(dev, TM1637IOC_OFF);
 
   /* Close the device */
   close(dev);
@@ -85,7 +85,7 @@ timer_handler(int sig, siginfo_t *si, void *uc)
   /* Toggle a clock point for each timer tick if not always on */
   if (tpsPoint > CLOCKPOINT_ALWAYS)
   {
-    ioctl(dev, TM1637_IOCTL_CLOCKPOINT, &clockPoint);
+    ioctl(dev, TM1637IOC_SET_CLOCKPOINT, &clockPoint);
     clockPoint = !clockPoint;
   }
 }
@@ -238,13 +238,14 @@ main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
+  /* Clear a display and turn it on */
+  ioctl(dev, TM1637IOC_SET_RAWMODE, &((uint8_t){true}));
+  ioctl(dev, TM1637IOC_CLEAR);
+  ioctl(dev, TM1637IOC_ON);
+
   /* If run as a daemon oa as a control utility */
   if (backgroundRun)
     demonize();
-
-  /* Clear a display and turn it on */
-  ioctl(dev, TM1637_IOCTL_CLEAR);
-  ioctl(dev, TM1637_IOCTL_ON);
 
   /* Intercept signals to our function */
   if (signal (SIGINT, termination_handler) == SIG_IGN)

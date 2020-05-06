@@ -8,10 +8,11 @@
 #define CLOCKPOINT_ONCE		1
 #define CLOCKPOINT_TWICE	2
 
-#define TM1637_IOCTL_CLEAR	_IO('T', 1)
-#define TM1637_IOCTL_OFF	_IO('T', 2)
-#define TM1637_IOCTL_ON		_IO('T', 3)
-#define TM1637_IOCTL_BRIGHTNESS	_IOW('T', 11, uint8_t)
-#define TM1637_IOCTL_CLOCKPOINT	_IOW('T', 12, bool)
+#define TM1637IOC_CLEAR			_IO('T', 1)
+#define TM1637IOC_OFF			_IO('T', 2)
+#define TM1637IOC_ON			_IO('T', 3)
+#define TM1637IOC_SET_BRIGHTNESS	_IOW('T', 11, uint8_t)
+#define TM1637IOC_SET_CLOCKPOINT	_IOW('T', 12, uint8_t)
+#define TM1637IOC_SET_RAWMODE		_IOW('T', 13, uint8_t)
 
 #define sizeof_field(type,field)  (sizeof(((type *)0)->field))
