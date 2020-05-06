@@ -19,6 +19,7 @@ detach from a terminal;
 * uses `timer_create`(2) for output time and marking seconds by colon
 (1, 2 times per second or always on);
 * a signal interception for stopping itself correctly;
+* set raw mode for the device but restore its value on exit;
 
 I wrote this program for my little-task server on **Raspberry Pi 2** (One of
 a task is a NTPD service for getting a time from GLONASS).
