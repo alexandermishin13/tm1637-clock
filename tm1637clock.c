@@ -25,6 +25,7 @@ int dev;
 bool clockPoint = true;
 unsigned char digits[10] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f };
 unsigned char TimeDisp[4] = {0};
+uint8_t _raw_mode;
 
 /* Parameters */
 bool backgroundRun = false;
@@ -37,8 +38,9 @@ termination_handler(int signum)
   /* Destroy timer */
   timer_delete(timerID);
 
-  /* Off the display and terminate connection */
+  /* Off the display, restore old mode, and terminate connection */
   ioctl(dev, TM1637IOC_OFF);
+  ioctl(dev, TM1637IOC_SET_RAWMODE, &_raw_mode);
 
   /* Close the device */
   close(dev);
@@ -239,6 +241,7 @@ main(int argc, char **argv)
   }
 
   /* Clear a display and turn it on */
+  ioctl(dev, TM1637IOC_GET_RAWMODE, &_raw_mode);
   ioctl(dev, TM1637IOC_SET_RAWMODE, &((uint8_t){true}));
   ioctl(dev, TM1637IOC_CLEAR);
   ioctl(dev, TM1637IOC_ON);
