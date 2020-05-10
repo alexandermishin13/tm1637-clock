@@ -40,7 +40,9 @@ termination_handler(int signum)
 
   /* Off the display, restore old mode, and terminate connection */
   ioctl(dev, TM1637IOC_OFF);
-  ioctl(dev, TM1637IOC_SET_RAWMODE, &_raw_mode);
+  /* If raw_mode == 1 no need anything to do */
+  if (_raw_mode == 0)
+    ioctl(dev, TM1637IOC_SET_RAWMODE, &_raw_mode);
 
   /* Close the device */
   close(dev);
