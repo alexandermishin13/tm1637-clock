@@ -22,6 +22,8 @@ timer_t timerID;
 struct pidfh *pfh;
 int dev;
 
+struct tm1637_clock_t cl;
+
 bool clockPoint = true;
 unsigned char digits[10] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f };
 unsigned char TimeDisp[4] = {0};
@@ -62,8 +64,12 @@ timer_handler(int sig, siginfo_t *si, void *uc)
   time_t rawtime;
   struct tm tm;
 
+  /* Toggle a clock point for each timer tick if not always on */
+  if (tpsPoint > CLOCKPOINT_ALWAYS)
+    cl.tm_colon = !cl.tm_colon;
+
   /* No need to check time often than once of a second */
-  if (tpsPoint < CLOCKPOINT_TWICE || clockPoint)
+  if (cl.tm_colon || tpsPoint < CLOCKPOINT_TWICE)
   {
     /* Get local time (with timezone) */
     time (&rawtime);
@@ -72,26 +78,13 @@ timer_handler(int sig, siginfo_t *si, void *uc)
     /* Prepare new display digits array if a time change occurs
      * or use old one
      */
-    unsigned char loMin = digits[tm.tm_min % 10]; // Check if change occurs
-    if (loMin != TimeDisp[3])
-    {
-      TimeDisp[0] = digits[tm.tm_hour / 10];
-      TimeDisp[1] = digits[tm.tm_hour % 10];
-      TimeDisp[2] = digits[tm.tm_min / 10];
-      TimeDisp[3] = loMin; // Calculated already
-
-      /* Display a just prepared time array */
-      lseek(dev, 0, SEEK_SET);
-      write(dev, TimeDisp, 4);
+    if (cl.tm_min != tm.tm_min) {
+	cl.tm_min = tm.tm_min;
+	cl.tm_hour = tm.tm_hour;
     }
   }
 
-  /* Toggle a clock point for each timer tick if not always on */
-  if (tpsPoint > CLOCKPOINT_ALWAYS)
-  {
-    ioctl(dev, TM1637IOC_SET_CLOCKPOINT, &clockPoint);
-    clockPoint = !clockPoint;
-  }
+  ioctl(dev, TM1637IOC_SET_CLOCK, &cl);
 }
 
 
