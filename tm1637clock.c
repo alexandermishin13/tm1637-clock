@@ -24,11 +24,6 @@ int dev;
 
 struct tm1637_clock_t cl;
 
-bool clockPoint = true;
-unsigned char digits[10] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f };
-unsigned char TimeDisp[4] = {0};
-uint8_t _raw_mode;
-
 /* Parameters */
 bool backgroundRun = false;
 uint8_t tpsPoint = CLOCKPOINT_ALWAYS; // Times per second switch a point sign
@@ -42,9 +37,6 @@ termination_handler(int signum)
 
   /* Off the display, restore old mode, and terminate connection */
   ioctl(dev, TM1637IOC_OFF);
-  /* If raw_mode == 1 no need anything to do */
-  if (_raw_mode == 0)
-    ioctl(dev, TM1637IOC_SET_RAWMODE, &_raw_mode);
 
   /* Close the device */
   close(dev);
@@ -236,8 +228,6 @@ main(int argc, char **argv)
   }
 
   /* Clear a display and turn it on */
-  ioctl(dev, TM1637IOC_GET_RAWMODE, &_raw_mode);
-  ioctl(dev, TM1637IOC_SET_RAWMODE, &((uint8_t){true}));
   ioctl(dev, TM1637IOC_CLEAR);
   ioctl(dev, TM1637IOC_ON);
 
@@ -252,6 +242,7 @@ main(int argc, char **argv)
     signal (SIGTERM, SIG_IGN);
 
   /* Run a half seconds redraw of the display */
+  cl.tm_colon = true;
   createTimer(tpsPoint);
 
   /* Main loop */
