@@ -12,7 +12,7 @@ tm1637clock: tm1637clock.o
 	$(CC) $(LIBS) -lutil -lrt -o $@ tm1637clock.o
 
 clean:
-	rm *.o tm1637clock test
+	rm *.o tm1637clock
 
 install: tm1637clock
 	${SUDO_CMD} install -s -m 755 -o root -g wheel tm1637clock ${PREFIX}/sbin
@@ -21,9 +21,3 @@ install: tm1637clock
 
 uninstall:
 	${SUDO_CMD} rm ${PREFIX}/sbin/tm1637clock
-
-test: test.o
-	$(CXX) test.o ${LIBS} -lrt -o test
-
-test.o: test.c
-	$(CXX) $(CFLAGS) test.c
