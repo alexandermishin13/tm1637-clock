@@ -16,7 +16,11 @@
 #include <fcntl.h>
 #include <stdbool.h>
 #include <sys/ioctl.h>
-#include "tm1637clock.h"
+#include <dev/tm1637/tm1637.h>
+
+#define CLOCKPOINT_ALWAYS	0
+#define CLOCKPOINT_ONCE		1
+#define CLOCKPOINT_TWICE	2
 
 timer_t timerID;
 struct pidfh *pfh;
