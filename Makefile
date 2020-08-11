@@ -1,22 +1,32 @@
 # $FreeBSD$
 
+PREFIX= /usr/local
 MK_DEBUG_FILES= no
 
 PROG= tm1637clock
-PROG_TYPE= DAEMON
-BINDIR= /usr/local/sbin
+BINDIR= ${PREFIX}/sbin
 
 FILESGROUPS= RC
-RCDIR= /usr/local/etc/rc.d
+RCDIR= ${PREFIX}/etc/rc.d
 RCMODE= 0755
-RC= rc.d/tm1637clock
+RC= rc.d/${PROG}
 
-MAN=
+MAN= ${PROG}.8
+MANDIR= ${PREFIX}/share/man/man
+MANSUBDIR= /arm
+
+MANFULLDIR= ${MANDIR}8${MANSUBDIR}
 
 LDADD= -lutil -lrt
 
+beforeinstall:
+.if !exists(${MANFULLDIR})
+	@mkdir -p ${MANFULLDIR}
+.endif
+
 uninstall:
-	rm ${BINDIR}/tm1637clock
-	rm ${RCDIR}/tm1637clock
+	rm ${BINDIR}/${PROG}
+	rm ${RCDIR}/${PROG}
+	rm ${MANFULLDIR}/${MAN}.gz
 
 .include <bsd.prog.mk>
