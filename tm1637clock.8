@@ -1,0 +1,37 @@
+.Dd Aug 11, 2020
+.Dt TM1637CLOCK 8
+.Os
+.Sh NAME
+.Nm tm1637clock
+.Nd Digital clock daemon for a TM1637 4 Digit Display
+.Sh SYNOPSIS
+.Nm
+.Op Fl b
+.Op Fl p Ar mode
+.Sh DESCRIPTION
+The program displays the time on the
+.Nm tm1637
+display. For it works need a kernel module
+.Dq tm1637.ko
+to be installed (See below).
+.Sh OPTIONS
+The following options are supported by
+.Nm :
+.Bl -tag -width automatic
+.It Fl b
+Run the program in background as a daemon.
+.It Fl p Ar mode
+Set a clockpoints blink mode. Where
+.Ar mode
+is:
+.Dl 0 - always on,
+.Dl 1 - once per second,
+.Dl 2 - twice per second.
+.Sh SEE ALSO
+A tm1637 kernel module
+.Em https://gitlab.com/alexandermishin13/tm1637-kmod
+.Pp
+.Xr tm1637 4
+.Sh AUTHORS
+.An -nosplit
+.An Alexander Mishin Aq mishin@mh.net.ru
