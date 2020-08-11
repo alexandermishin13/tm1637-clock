@@ -53,8 +53,7 @@ termination_handler(int signum)
 
 
 /* timer handler. Effectively redraw the display */
-static
-void
+static void
 timer_handler(int sig, siginfo_t *si, void *uc)
 {
   time_t rawtime;
@@ -85,8 +84,7 @@ timer_handler(int sig, siginfo_t *si, void *uc)
 
 
 /* Create and start a half-second timer */
-static
-void
+static void
 createTimer(uint8_t tps)
 {
   struct sigaction sa;
@@ -132,8 +130,7 @@ createTimer(uint8_t tps)
 }
 
 /* Print usage after mistaken params */
-static
-void
+static void
 usage(char* program)
 {
   printf("Usage:\n %s [-b] [-p <clock_point_mode>]\n", program);
@@ -141,8 +138,7 @@ usage(char* program)
 }
 
 /* Get a clockpoint blink value from params */
-static
-uint8_t
+static uint8_t
 get_tpsPoint(char* nptr)
 {
   int number;
@@ -156,7 +152,7 @@ get_tpsPoint(char* nptr)
 }
 
 /* Get and decode params */
-void
+static void
 get_param(int argc, char **argv)
 {
   int opt;
@@ -184,7 +180,7 @@ get_param(int argc, char **argv)
 
 
 /* Demonize wrapper */
-void
+static void
 demonize(void)
 {
   pid_t otherpid;
