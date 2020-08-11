@@ -177,7 +177,7 @@ get_param(int argc, char **argv)
       case '?': // unknown option...
       default:
         usage(argv[0]);
-        break;
+        exit (0);
     }
   }
 }
