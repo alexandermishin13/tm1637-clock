@@ -133,8 +133,10 @@ createTimer(uint8_t tps)
 static void
 usage(char* program)
 {
-  printf("Usage:\n %s [-b] [-p <clock_point_mode>]\n", program);
-  printf("\t a clock point: 0-always on, 1-once per second, 2-twice per second\n");
+  printf("Usage:\n %s [-b] [-p <mode>]\n", program);
+  printf("\t -b: Run the program in background;\n");
+  printf("\t -p: Set a clockpoint mode, where <mode>:\n");
+  printf("\t\t0-always on, 1-once per second, 2-twice per second\n");
 }
 
 /* Get a clockpoint blink value from params */
