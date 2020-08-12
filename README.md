@@ -18,8 +18,9 @@ The daemon:
 detach from a terminal;
 * uses `timer_create`(2) for output time and marking seconds by colon
 (1, 2 times per second or always on);
-* a signal interception for stopping itself correctly;
-* set raw mode for the device but restore its value on exit;
+* uses a signal interception for stopping itself correctly;
+* interacts with device */dev/tm1637* by writing digits to it and using ioctl
+calls;
 
 I wrote this program for my little-task server on **Raspberry Pi 2** (One of
 a task is a NTPD service for getting a time from GLONASS).
@@ -41,8 +42,11 @@ git clone https://gitlab.com/alexandermishin13/tm1637-clock.git
 ```
 
 ## Installation
+As desribed above, You need firstly to install and load the tm1637 kernel
+module. For a description of how to do this, refer to the 
+[tm1637-kmod](https://gitlab.com/alexandermishin13/tm1637-kmod) project page
 
-For installation type:
+For the program installation type:
 ```
 make
 sudo make install
