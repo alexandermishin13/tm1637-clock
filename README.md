@@ -68,14 +68,19 @@ two times more efficient mode is `1` as it less often writes to the display.
 And even more efficient mode is `0` as it writes to the display just once a
 minute.
 
-Running as a daemon
+Typical it is run as a daemon by a service startup script:
 ```
-./tm1637clock -b [-p <clockpoint mode>]
+./tm1637clock -b [-p <mode>]
 ```
 
-Running as a control utility
+but You can run it like a regular program by omitting the `-b` option.
+
+You can turn on, off or set brightness of the display by interacting with the
+tm1637 kernel driver using sysctl variables. No special privileges required
+for it:
 ```
-./tm1637clock [-p <clockpoint mode>]
+sysctl dev.tm1637.0.brightness=3
+sysctl dev.tm1637.0.on=0
 ```
 
 ## Manage the service
@@ -84,7 +89,7 @@ If You wish to start service automatically with a boot of operating system,
 You can:
 * add to a file */etc/rc.conf*
 * create a new file */usr/local/etc/rc.conf.d/tm1637clock* and add a followed
-string to it:
+string to it (Or just copy its example from sources):
 ```
 tm1637clock_enable="YES"
 tm1637clock_flags="-b -p 2"
