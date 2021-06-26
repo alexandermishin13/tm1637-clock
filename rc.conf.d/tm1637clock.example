@@ -1,2 +1,2 @@
 tm1637clock_enable="YES"
-tm1637clock_flags="-b -p 1"
+tm1637clock_flags="-b -d /dev/tm1637 -p 1"

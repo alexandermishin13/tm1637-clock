@@ -24,6 +24,7 @@
 
 timer_t timerID;
 struct pidfh *pfh;
+char *dev_tm1637 = "/dev/tm1637";
 int dev;
 
 struct tm1637_clock_t cl;
@@ -133,8 +134,9 @@ createTimer(uint8_t tps)
 static void
 usage(char* program)
 {
-  printf("Usage:\n %s [-b] [-p <mode>]\n", program);
+  printf("Usage:\n %s [-b] [-d <device>] [-p <mode>]\n", program);
   printf("\t -b: Run the program in background;\n");
+  printf("\t -d: Set a tm1637 device name;\n");
   printf("\t -p: Set a clockpoint mode, where <mode>:\n");
   printf("\t\t0-always on, 1-once per second, 2-twice per second\n");
 }
@@ -159,23 +161,27 @@ get_param(int argc, char **argv)
 {
   int opt;
 
-  while((opt = getopt(argc, argv, "hbp:")) != -1)
+  while((opt = getopt(argc, argv, "hbd:p:")) != -1)
   {
     switch(opt)
     {
       case 'b': // go to background (demonize)
-        backgroundRun = true;
-        break;
+	backgroundRun = true;
+	break;
 
       case 'p': // clock point change mode
-        tpsPoint = get_tpsPoint(optarg);
-        break;
+	tpsPoint = get_tpsPoint(optarg);
+	break;
+
+      case 'd': // sensor cdev
+	dev_tm1637 = optarg;
+	break;
 
       case 'h': // help request
       case '?': // unknown option...
       default:
-        usage(argv[0]);
-        exit (0);
+	usage(argv[0]);
+	exit (0);
     }
   }
 }
@@ -222,7 +228,7 @@ main(int argc, char **argv)
    */
   get_param(argc, argv);
 
-  dev = open("/dev/tm1637", O_WRONLY | O_DIRECT);
+  dev = open(dev_tm1637, O_WRONLY | O_DIRECT);
   if (dev < 0)
   {
     perror("opening tm1637 device");
