@@ -6,10 +6,9 @@ MK_DEBUG_FILES= no
 PROG= tm1637clock
 BINDIR= ${PREFIX}/sbin
 
-FILESGROUPS= RC
-RCDIR= ${PREFIX}/etc/rc.d
-RCMODE= 0755
-RC= rc.d/${PROG}
+SCRIPTS= ${PROG}.sh
+SCRIPTSNAME_${PROG}.sh= ${PROG}
+SCRIPTSDIR_${PROG}.sh= ${PREFIX}/etc/rc.d
 
 MAN= ${PROG}.8
 MANDIR= ${PREFIX}/share/man/man
@@ -26,7 +25,7 @@ beforeinstall:
 
 uninstall:
 	rm ${BINDIR}/${PROG}
-	rm ${RCDIR}/${PROG}
+	rm ${PREFIX}/etc/rc.d/${PROG}
 	rm ${MANFULLDIR}/${MAN}.gz
 
 .include <bsd.prog.mk>
