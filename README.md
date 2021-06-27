@@ -18,8 +18,9 @@ The daemon:
 detach from a terminal;
 * uses `timer_create`(2) for output time and marking seconds by colon
 (1, 2 times per second or always on);
-* a signal interception for stopping itself correctly;
-* set raw mode for the device but restore its value on exit;
+* uses a signal interception for stopping itself correctly;
+* interacts with device */dev/tm1637* by writing digits to it and using ioctl
+calls;
 
 I wrote this program for my little-task server on **Raspberry Pi 2** (One of
 a task is a NTPD service for getting a time from GLONASS).
@@ -41,8 +42,11 @@ git clone https://gitlab.com/alexandermishin13/tm1637-clock.git
 ```
 
 ## Installation
+As desribed above, You need firstly to install and load the tm1637 kernel
+module. For a description of how to do this, refer to the 
+[tm1637-kmod](https://gitlab.com/alexandermishin13/tm1637-kmod) project page
 
-For installation type:
+For the program installation type:
 ```
 make
 sudo make install
@@ -68,14 +72,19 @@ two times more efficient mode is `1` as it less often writes to the display.
 And even more efficient mode is `0` as it writes to the display just once a
 minute.
 
-Running as a daemon
+Typical it is run as a daemon by a service startup script:
 ```
-./tm1637clock -b [-p <clockpoint mode>]
+./tm1637clock -b [-p <mode>]
 ```
 
-Running as a control utility
+but You can run it like a regular program by omitting the `-b` option.
+
+You can turn on, off or set brightness of the display by interacting with the
+tm1637 kernel driver using sysctl variables. No special privileges required
+for it:
 ```
-./tm1637clock [-p <clockpoint mode>]
+sysctl dev.tm1637.0.brightness=3
+sysctl dev.tm1637.0.on=0
 ```
 
 ## Manage the service
@@ -84,7 +93,7 @@ If You wish to start service automatically with a boot of operating system,
 You can:
 * add to a file */etc/rc.conf*
 * create a new file */usr/local/etc/rc.conf.d/tm1637clock* and add a followed
-string to it:
+string to it (Or just copy its example from sources):
 ```
 tm1637clock_enable="YES"
 tm1637clock_flags="-b -p 2"
