@@ -6,32 +6,50 @@
 .Nd Digital clock daemon for a TM1637 4 Digit Display
 .Sh SYNOPSIS
 .Nm
-.Op Fl b
+.Op Fl d Ar device
 .Op Fl p Ar mode
+.Op Fl b
 .Sh DESCRIPTION
-The program displays the time on the
+The program displays a current time on a
 .Nm tm1637
-display. For it works need a kernel module
+display. For it works need either a kernel module
 .Dq tm1637.ko
+or a
+.Nm cuse
+based driver
+.Dq tm1637d
 to be installed (See below).
 .Sh OPTIONS
 The following options are supported by
 .Nm :
 .Bl -tag -width automatic
-.It Fl b
-Run the program in background as a daemon.
-.It Fl p Ar mode
+.It Fl d , Ic --device Ar device
+Specify a
+.Xr tm1637 4
+or
+.Xr tm1637d 8
+character device. The compiled-in default is
+.Pa /dev/tm1637 Ns ;
+.It Fl p , Ic --point Ar mode
 Set a clockpoints blink mode. Where
 .Ar mode
 is:
 .Dl 0 - always on,
 .Dl 1 - once per second,
-.Dl 2 - twice per second.
+.Dl 2 - twice per second;
+.It Fl b
+Run the program in background as a daemon.
 .Sh SEE ALSO
+.Bl -bullet -compact
+.It
 A tm1637 kernel module
 .Em https://gitlab.com/alexandermishin13/tm1637-kmod
+.It
+A cuse based tm1637 driver
+.Em https://gitlab.com/alexandermishin13/tm1637-cuse
+.El
 .Pp
-.Xr tm1637 4
+.Xr tm1637 4 , Xr tm1637d 8
 .Sh AUTHORS
 .An -nosplit
 .An Alexander Mishin Aq mishin@mh.net.ru
