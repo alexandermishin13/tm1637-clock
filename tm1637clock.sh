@@ -19,10 +19,13 @@ rcvar=tm1637clock_enable
 load_rc_config $name
 
 : ${tm1637clock_enable:="NO"}
+: ${tm1637clock_device:="/dev/tm1637"}
+: ${tm1637clock_point:="1"}
 : ${tm1637clock_flags:="-b"}
 
 pidfile=${tm1637clock_pidfile-"/var/run/$name.pid"}
 
 command=/usr/local/sbin/$name
+command_args="--device ${tm1637clock_device} --point ${tm1637clock_point} ${tm1637clock_flags}"
 
 run_rc_command "$@"

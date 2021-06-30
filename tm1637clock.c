@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdbool.h>
@@ -159,27 +160,33 @@ get_tpsPoint(char* nptr)
 static void
 get_param(int argc, char **argv)
 {
-  int opt;
+  static int opt, long_index = 0;
+  extern char *optarg;
 
-  while((opt = getopt(argc, argv, "hbd:p:")) != -1)
-  {
-    switch(opt)
-    {
-      case 'b': // go to background (demonize)
+  static struct option long_options[] = {
+	{"device", required_argument, 0, 'd' },
+	{"point",  required_argument, 0, 'p' },
+	{"help",   required_argument, 0, 'h' },
+	{0, 0, 0, 0}
+  };
+
+  while ((opt = getopt_long(argc, argv, "d:p:bh",long_options,&long_index)) != -1) {
+    switch (opt) {
+    case 'b': // go to background (demonize)
 	backgroundRun = true;
 	break;
 
-      case 'p': // clock point change mode
+    case 'p': // clock point change mode
 	tpsPoint = get_tpsPoint(optarg);
 	break;
 
-      case 'd': // sensor cdev
+    case 'd': // sensor cdev
 	dev_tm1637 = optarg;
 	break;
 
-      case 'h': // help request
-      case '?': // unknown option...
-      default:
+    case 'h': // help request
+    case '?': // unknown option...
+    default:
 	usage(argv[0]);
 	exit (0);
     }
