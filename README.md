@@ -4,14 +4,15 @@
 
 ## About
 
-A simple clock daemon which worked with
+A simple clock daemon that works with a character device created by the
 [tm1637-kmod](https://gitlab.com/alexandermishin13/tm1637-kmod) kernel driver
-written for **FreeBSD**. It is a successor of my other project
+or the [tm1637-cuse](https://gitlab.com/alexandermishin13/tm1637-cuse) service.
+It is a successor of my other project
 [digitalclock](https://gitlab.com/alexandermishin13/digitalclock) based on a 
 library [tm1637-display](https://gitlab.com/alexandermishin13/tm1637-display).
-I cut out a socket functional from it with controlling a brightness level of
-the display. This functionality is implemented by the kernel driver using
-sysctl variables.
+Brightness control can be done through the sysctl variables of the kernel
+driver "tm1637.ko" or by sending control strings to the character display
+device.
 
 The daemon:
 * creates a `pidfile` and uses `daemon`(8) if run with `-b` parameter for
@@ -22,8 +23,8 @@ detach from a terminal;
 * interacts with device */dev/tm1637* by writing digits to it and using ioctl
 calls;
 
-I wrote this program for my little-task server on **Raspberry Pi 2** (One of
-a task is a NTPD service for getting a time from GLONASS).
+I wrote this program for my little-task server on **Raspberry Pi 2** (Another
+task is a NTPD service for getting a time from GLONASS).
 
 ## Dependencies
 
