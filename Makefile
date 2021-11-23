@@ -1,6 +1,6 @@
 # $FreeBSD$
 
-PREFIX= /usr/local
+PREFIX?= /usr/local
 MK_DEBUG_FILES= no
 
 PROG= tm1637clock
@@ -11,13 +11,13 @@ SCRIPTSNAME_${PROG}.sh= ${PROG}
 SCRIPTSDIR_${PROG}.sh= ${PREFIX}/etc/rc.d
 
 MAN= ${PROG}.8
-MANDIR= ${PREFIX}/share/man/man
+MANDIR= ${PREFIX}/man/man
 
 LDADD= -lutil -lrt
 
 uninstall:
 	rm ${BINDIR}/${PROG}
 	rm ${PREFIX}/etc/rc.d/${PROG}
-	rm ${MANDIR}/${MAN}.gz
+	rm ${MANDIR}8/${MAN}.gz
 
 .include <bsd.prog.mk>
