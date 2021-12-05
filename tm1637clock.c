@@ -23,16 +23,16 @@
 #define CLOCKPOINT_ONCE		1
 #define CLOCKPOINT_TWICE	2
 
-timer_t timerID;
-struct pidfh *pfh;
-char *dev_tm1637 = "/dev/tm1637";
-int dev;
+static timer_t timerID;
+static struct pidfh *pfh;
+static const char *dev_tm1637 = "/dev/tm1637";
+static int dev;
 
-struct tm1637_clock_t cl;
+static struct tm1637_clock_t cl;
 
 /* Parameters */
-bool backgroundRun = false;
-uint8_t tpsPoint = CLOCKPOINT_ALWAYS; // Times per second switch a point sign
+static bool backgroundRun = false;
+static uint8_t tpsPoint = CLOCKPOINT_ALWAYS; // Times per second switch a point sign
 
 /* Signals handler. Prepare the programm for end */
 static void
